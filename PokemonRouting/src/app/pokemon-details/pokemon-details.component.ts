@@ -1,4 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+
+
+interface IAbility {
+  ability: string;
+}
+
+interface IDetails {
+  abilities: IAbility[];
+  name: string;
+}
 
 @Component({
   selector: 'app-pokemon-details',
@@ -7,9 +19,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PokemonDetailsComponent implements OnInit {
 
-  constructor() { }
+  public pokemon: IDetails = { abilities: [], name: '' };
+  public pokeId: number;
+  //public url:'https://pokeapi.co/api/v2/pokemon/';
 
-  ngOnInit() {
+
+  constructor(private httpClient: HttpClient, private acRoute: ActivatedRoute) { }
+
+  async ngOnInit() {
+    this.acRoute.paramMap.subscribe((params: ParamMap) => {
+      this.pokeId = parseInt(params.get('pokemonId'));
+    });
+
+    this.pokemon = await this.httpClient.get<IDetails>('https://pokeapi.co/api/v2/pokemon/' + this.pokeId).toPromise();
   }
 
 }
